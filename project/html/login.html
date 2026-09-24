@@ -1,0 +1,16 @@
+<main>
+  <h1>AMC Bank</h1>
+  <p>Sign in to continue</p>
+
+  <form action="/api/auth/login" method="post">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" required autocomplete="username">
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" required autocomplete="current-password">
+
+    <button type="submit">Sign in</button>
+  </form>
+
+  <p><small>Demo users: admin, officer, clerk</small></p>
+</main>

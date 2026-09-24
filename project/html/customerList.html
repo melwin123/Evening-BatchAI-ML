@@ -1,0 +1,62 @@
+<header>
+  <strong>AMC Bank</strong>
+  <span>admin · ROLE_ADMIN</span>
+  <a href="#login">Logout</a>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="#dashboard">Dashboard</a></li>
+    <li><a href="#customers">Customers</a></li>
+    <li><a href="#accounts">Accounts</a></li>
+    <li><a href="#loans">Loans</a></li>
+  </ul>
+</nav>
+
+<main>
+  <h1>Customers</h1>
+  <p>128 records</p>
+  <a href="#customer-form">Add customer</a>
+
+  <form action="/api/customers" method="get">
+    <label for="search">Search</label>
+    <input type="search" id="search" name="search" placeholder="name or email">
+
+    <label for="city">City</label>
+    <select id="city" name="city">
+      <option value="">All cities</option>
+      <option>Bangalore</option>
+      <option>Mumbai</option>
+      <option>Chennai</option>
+    </select>
+
+    <button type="submit">Apply</button>
+  </form>
+
+  <table border="1">
+    <thead>
+      <tr><th>Id</th><th>Name</th><th>Email</th><th>City</th><th>Accounts</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>101</td><td>Anita Rao</td><td>anita@example.com</td><td>Bangalore</td><td>2</td>
+        <td>
+          <a href="#customer-detail">View</a>
+          <a href="#customer-form">Edit</a>
+          <button type="button">Delete</button>
+        </td>
+      </tr>
+      <tr>
+        <td>102</td><td>Vikram Shah</td><td>vikram@example.com</td><td>Mumbai</td><td>1</td>
+        <td>
+          <a href="#customer-detail">View</a>
+          <a href="#customer-form">Edit</a>
+          <button type="button">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button type="button">Previous</button>
+  <button type="button">Next</button>
+</main>
