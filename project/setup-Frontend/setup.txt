@@ -1,0 +1,128 @@
+npm create vite@latest frontend -- --template react
+npm install
+npm install axios react-router-dom
+
+src/
+├── api/
+│   ├── http.js
+│   └── api.js
+├── auth/
+│   └── AuthContext.jsx
+├── pages/
+│   └── Login.jsx
+├── index.css
+├── App.jsx
+└── main.jsx
+
+import axios from 'axios'
+
+const http = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 10000
+})
+
+// Attach the JWT token to every outgoing request
+http.interceptors.request.use((config) => {
+  const raw = sessionStorage.getItem('auth')
+  if (raw) {
+    const { token } = JSON.parse(raw)
+    if (token) config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+// Turn backend errors into one predictable object
+http.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      const { status, data } = error.response
+      if (status === 401 && !error.config.url.includes('/auth/login')) {
+        sessionStorage.removeItem('auth')
+        window.location.href = '/login'
+      }
+      return Promise.reject({
+        status,
+        message: data?.message || `Request failed (${status})`,
+        fields: data?.errors && Object.keys(data.errors).length ? data.errors : null
+      })
+    }
+    if (error.request) {
+      return Promise.reject({ message: 'Server not reachable. Is Spring Boot running on 8080?' })
+    }
+    return Promise.reject({ message: error.message })
+  }
+)
+
+export default http
+
+
+import http from './http'
+
+export const authApi = {
+  login: (payload) => http.post('/auth/login', payload).then((r) => r.data)
+}
+
+
+import http from './http'
+
+export const authApi = {
+  login: (payload) => http.post('/auth/login', payload).then((r) => r.data)
+}
+
+
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { authApi } from '../api/api'
+
+export default function Login() {
+  const navigate = useNavigate()
+  const [form, setForm] = useState({ username: '', password: '' })
+  const [error, setError] = useState(null)
+  const [busy, setBusy] = useState(false)
+
+  const change = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+
+  const submit = async (e) => {
+    e.preventDefault()
+    setBusy(true)
+    setError(null)
+    try {
+      const data = await authApi.login(form)
+      sessionStorage.setItem('auth', JSON.stringify(data))
+      navigate('/dashboard')
+    } catch (err) {
+      setError(err.message || 'Login failed')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="login-wrap">
+      <form className="login-card" onSubmit={submit}>
+        <div>
+          <div className="brand" style={{ fontSize: 22 }}>AMC Bank</div>
+          <div className="muted">Sign in to continue</div>
+        </div>
+
+        {error && <div className="banner">{error}</div>}
+
+        <div className="field">
+          <label htmlFor="username">Username</label>
+          <input id="username" name="username" value={form.username} onChange={change} autoComplete="username" />
+        </div>
+
+        <div className="field">
+          <label htmlFor="password">Password</label>
+          <input id="password" name="password" type="password" value={form.password}
+                 onChange={change} autoComplete="current-password" />
+        </div>
+
+        <button type="submit" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
+        <div className="muted">Seeded users: admin / officer / clerk (password: &lt;name&gt;123)</div>
+      </form>
+    </div>
+  )
+}
