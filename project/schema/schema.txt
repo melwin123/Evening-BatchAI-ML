@@ -1,0 +1,76 @@
+-- 1. Create and select database
+CREATE DATABASE IF NOT EXISTS bfsi_db;
+USE bfsi_db;
+
+-- 2. Drop existing tables if re-running (respecting foreign key dependencies)
+DROP TABLE IF EXISTS loan;
+DROP TABLE IF EXISTS account;
+DROP TABLE IF EXISTS customer;
+DROP TABLE IF EXISTS app_user;
+
+-- 3. AppUser Entity (for login authentication, separate from Bank Customers)
+CREATE TABLE app_user (
+    user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL, -- stores BCrypt hashed password
+    role VARCHAR(50) NOT NULL       -- e.g., 'ADMIN', 'CLERK', 'USER'
+);
+
+-- 4. Customer Entity
+CREATE TABLE customer (
+    customer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    city VARCHAR(50) NOT NULL,
+    pan_number VARCHAR(20) NOT NULL UNIQUE,
+    created_on DATE NOT NULL
+);
+
+-- 5. Account Entity (ManyToOne with Customer)
+CREATE TABLE account (
+    account_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    account_number VARCHAR(50) NOT NULL UNIQUE,
+    account_type VARCHAR(20) NOT NULL, -- 'SAVINGS' or 'CURRENT'
+    balance DOUBLE NOT NULL,
+    opened_on DATE NOT NULL,
+    customer_id BIGINT NOT NULL,
+    CONSTRAINT fk_account_customer 
+        FOREIGN KEY (customer_id) 
+        REFERENCES customer(customer_id) 
+        ON DELETE CASCADE
+);
+
+-- 6. Loan Entity (ManyToOne with Customer)
+CREATE TABLE loan (
+    loan_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    loan_type VARCHAR(50) NOT NULL,
+    principal_amount DOUBLE NOT NULL,
+    interest_rate DOUBLE NOT NULL,
+    tenure_months INT NOT NULL,
+    sanctioned_on DATE NOT NULL,
+    customer_id BIGINT NOT NULL,
+    CONSTRAINT fk_loan_customer 
+        FOREIGN KEY (customer_id) 
+        REFERENCES customer(customer_id) 
+        ON DELETE CASCADE
+);
+
+-- ==========================================
+-- DUMMY SEED DATA FOR TESTING TODAY
+-- ==========================================
+
+-- Insert a test AppUser login (Password is 'password123' hashed with BCrypt)
+INSERT INTO app_user (username, password, role) 
+VALUES ('admin', 'password', 'ADMIN');
+
+-- Insert a test Customer
+INSERT INTO customer (name, email, city, pan_number, created_on) 
+VALUES ('John', 'john@example.com', 'Bangalore', 'ABCDE1234F', '2026-01-15');
+
+-- Insert a test Account for John Doe
+INSERT INTO account (account_number, account_type, balance, opened_on, customer_id) 
+VALUES ('ACC987654321', 'SAVINGS', 50000.00, '2026-01-15', 1);
+
+-- Insert a test Loan for John Doe
+INSERT INTO loan (loan_type, principal_amount, interest_rate, tenure_months, sanctioned_on, customer_id) 
+VALUES ('HOME_LOAN', 2500000.00, 8.5, 240, '2026-02-01', 1);
