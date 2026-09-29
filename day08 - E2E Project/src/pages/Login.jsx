@@ -55,8 +55,7 @@ export default function Login() {
         </div>
 
         <button type="submit" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
-        <div className="muted">Seeded users: admin / officer / clerk (password: &lt;name&gt;123)</div>
-      </form>
+             </form>
     </div>
   )
 }
