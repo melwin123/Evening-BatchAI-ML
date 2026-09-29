@@ -55,6 +55,13 @@ public class GlobalExceptionHandler {
         return body(HttpStatus.FORBIDDEN, "Your role is not allowed to perform this action", null);
     }
 
+    @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Map<String, Object>> methodNotAllowed(
+            org.springframework.web.HttpRequestMethodNotSupportedException ex) {
+        return body(HttpStatus.METHOD_NOT_ALLOWED,
+                ex.getMethod() + " is not supported on this URL - is the backend rebuilt?", null);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> everythingElse(Exception ex) {
         return body(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error: " + ex.getMessage(), null);

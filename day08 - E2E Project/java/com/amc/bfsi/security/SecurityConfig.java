@@ -39,16 +39,33 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsSource()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api/health").permitAll()
+                .requestMatchers("/api/auth/**", "/api/health", "/error").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/api/users/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
                 .requestMatchers("/api/loans/**").hasAnyRole("ADMIN", "OFFICER")
                 .anyRequest().authenticated())
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // no token / expired token -> 401 (the React app then sends the user back to login)
+            // logged in but wrong role  -> 403, both in the same JSON shape as GlobalExceptionHandler
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((req, res, e) ->
+                    writeError(res, 401, "Unauthorized", "Please sign in - token missing or expired"))
+                .accessDeniedHandler((req, res, e) ->
+                    writeError(res, 403, "Forbidden", "Your role is not allowed to perform this action")))
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    private static void writeError(jakarta.servlet.http.HttpServletResponse res, int status,
+                                   String error, String message) throws java.io.IOException {
+        res.setStatus(status);
+        res.setContentType("application/json");
+        res.getWriter().write("{\"timestamp\":\"" + java.time.LocalDateTime.now()
+                + "\",\"status\":" + status + ",\"error\":\"" + error
+                + "\",\"message\":\"" + message + "\",\"errors\":{}}");
     }
 
     @Bean
@@ -64,7 +81,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        // patterns allow any port, e.g. localhost:5173 or 5174 when Vite picks the next free port
+        config.setAllowedOriginPatterns(Arrays.stream(allowedOrigins.split(",")).map(String::trim).toList());
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

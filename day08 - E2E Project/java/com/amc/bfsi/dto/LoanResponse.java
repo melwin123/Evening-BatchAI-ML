@@ -14,6 +14,7 @@ public class LoanResponse {
     private Double emi;
     private LocalDate sanctionedOn;
     private Long customerId;
+    private String customerName;
 
     public static LoanResponse of(Loan l) {
         LoanResponse r = new LoanResponse();
@@ -26,6 +27,7 @@ public class LoanResponse {
         r.sanctionedOn = l.getSanctionedOn();
         if (l.getCustomer() != null) {
             r.customerId = l.getCustomer().getCustomerId();
+            r.customerName = l.getCustomer().getName();
         }
         return r;
     }
@@ -38,4 +40,5 @@ public class LoanResponse {
     public Double getEmi() { return emi; }
     public LocalDate getSanctionedOn() { return sanctionedOn; }
     public Long getCustomerId() { return customerId; }
+    public String getCustomerName() { return customerName; }
 }

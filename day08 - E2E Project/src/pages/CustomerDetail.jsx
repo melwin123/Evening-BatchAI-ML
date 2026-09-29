@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { accountApi, customerApi } from '../api/api'
+import { useAuth } from '../auth/AuthContext.jsx'
 
 export default function CustomerDetail() {
   const { id } = useParams()
+  const { hasRole } = useAuth()
+  const isAdmin = hasRole('ROLE_ADMIN')
+  const canSanction = hasRole(['ROLE_ADMIN', 'ROLE_OFFICER'])
   const [customer, setCustomer] = useState(null)
   const [error, setError] = useState(null)
 
@@ -54,7 +58,7 @@ export default function CustomerDetail() {
                 <td>{a.accountType}</td>
                 <td>{a.balance}</td>
                 <td>{a.openedOn}</td>
-                <td><button className="link" onClick={() => close(a.accountId)}>Close</button></td>
+                <td>{isAdmin && <button className="link" onClick={() => close(a.accountId)}>Close</button>}</td>
               </tr>
             ))}
           </tbody>
@@ -63,7 +67,7 @@ export default function CustomerDetail() {
 
       <div className="spread">
         <h2 style={{ fontSize: 15, margin: 0 }}>Loans</h2>
-        <Link className="btn" to={`/customers/${id}/loans/new`}>Sanction loan</Link>
+        {canSanction && <Link className="btn" to={`/customers/${id}/loans/new`}>Sanction loan</Link>}
       </div>
       {customer.loans?.length ? (
         <table>

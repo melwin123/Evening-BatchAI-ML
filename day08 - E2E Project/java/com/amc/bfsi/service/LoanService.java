@@ -24,6 +24,10 @@ public class LoanService {
         this.customerService = customerService;
     }
 
+    public List<Loan> findAll() {
+        return loanRepository.findAll();
+    }
+
     public List<Loan> findByCustomer(Long customerId) {
         customerService.findById(customerId);          // 404 if the customer is unknown
         return loanRepository.findByCustomerCustomerId(customerId);

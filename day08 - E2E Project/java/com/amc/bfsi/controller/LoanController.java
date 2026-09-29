@@ -27,6 +27,12 @@ public class LoanController {
                 .body(LoanResponse.of(service.sanction(request)));
     }
 
+    @GetMapping
+    @Transactional(readOnly = true)
+    public List<LoanResponse> findAll() {
+        return service.findAll().stream().map(LoanResponse::of).toList();
+    }
+
     @GetMapping("/customer/{customerId}")
     @Transactional(readOnly = true)
     public List<LoanResponse> byCustomer(@PathVariable Long customerId) {

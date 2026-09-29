@@ -4,13 +4,19 @@ const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [auth, setAuth] = useState(() => {
-    const raw = sessionStorage.getItem('auth')
-    return raw ? JSON.parse(raw) : null
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('auth'))
+      // an expired token would make every API call fail - start logged out instead
+      if (saved?.token && (!saved.expiresAt || saved.expiresAt > Date.now())) return saved
+    } catch { /* corrupt entry - ignore */ }
+    sessionStorage.removeItem('auth')
+    return null
   })
 
   const login = (data) => {
-    sessionStorage.setItem('auth', JSON.stringify(data))
-    setAuth(data)
+    const session = { ...data, expiresAt: Date.now() + (data.expiresInMs || 3600000) }
+    sessionStorage.setItem('auth', JSON.stringify(session))
+    setAuth(session)
   }
 
   const logout = () => {
@@ -18,7 +24,8 @@ export function AuthProvider({ children }) {
     setAuth(null)
   }
 
-  const hasRole = (role) => !!auth && auth.roles.includes(role)
+  // accepts one role or a list: hasRole('ROLE_ADMIN') / hasRole(['ROLE_ADMIN', 'ROLE_OFFICER'])
+  const hasRole = (role) => !!auth && [].concat(role).some((r) => auth.roles?.includes(r))
 
   return (
     <AuthContext.Provider value={{ auth, login, logout, hasRole }}>

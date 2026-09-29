@@ -24,7 +24,13 @@ public class AppUserDetailsService implements UserDetailsService {
 
         return User.withUsername(user.getUsername())
                 .password(user.getPassword())
-                .roles(user.getRole())          // roles() adds the ROLE_ prefix for us
+                .roles(normalizeRole(user.getRole()))   // roles() adds the ROLE_ prefix for us
                 .build();
+    }
+
+    /** roles() rejects values that already start with ROLE_, so accept "ROLE_OFFICER" as well as "OFFICER". */
+    private static String normalizeRole(String role) {
+        String r = role == null ? "USER" : role.trim().toUpperCase();
+        return r.startsWith("ROLE_") ? r.substring(5) : r;
     }
 }

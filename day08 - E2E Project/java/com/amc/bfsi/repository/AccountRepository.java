@@ -10,6 +10,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     List<Account> findByCustomerCustomerId(Long customerId);
 
+    boolean existsByAccountNumber(String accountNumber);
+
     @Query("select coalesce(sum(a.balance), 0) from Account a")
     double totalDeposits();
 

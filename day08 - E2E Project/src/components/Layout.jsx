@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext.jsx'
 
 export default function Layout() {
-  const { auth, logout } = useAuth()
+  const { auth, logout, hasRole } = useAuth()
   const navigate = useNavigate()
 
   const signOut = () => {
@@ -24,6 +24,10 @@ export default function Layout() {
         <nav className="sidebar">
           <NavLink to="/dashboard">Dashboard</NavLink>
           <NavLink to="/customers">Customers</NavLink>
+          <NavLink to="/accounts">Accounts</NavLink>
+          {/* the backend only lets ADMIN and OFFICER read /api/loans */}
+          {hasRole(['ROLE_ADMIN', 'ROLE_OFFICER']) && <NavLink to="/loans">Loans</NavLink>}
+          {hasRole('ROLE_ADMIN') && <NavLink to="/users">Users</NavLink>}
         </nav>
         <main><Outlet /></main>
       </div>

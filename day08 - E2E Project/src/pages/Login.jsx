@@ -14,14 +14,20 @@ export default function Login() {
 
   const submit = async (e) => {
     e.preventDefault()
+    const username = form.username.trim()
+    if (!username || !form.password) {
+      setError(!username && !form.password ? 'Username and password are required'
+        : !username ? 'Username is required' : 'Password is required')
+      return
+    }
     setBusy(true)
     setError(null)
     try {
-      const data = await authApi.login(form)
+      const data = await authApi.login({ username, password: form.password })
       login(data)
       navigate('/dashboard')
     } catch (err) {
-      setError(err.message)
+      setError(err.fields ? Object.values(err.fields).join(', ') : err.message)
     } finally {
       setBusy(false)
     }
