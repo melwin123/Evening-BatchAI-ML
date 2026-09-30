@@ -1,0 +1,39 @@
+-- ---------- customers ----------
+INSERT INTO customer (customer_id, name, email, city, pan_number, created_on) VALUES
+(2,  'Arjun',   'arjun@example.com',   'Bangalore', 'ARJPK1001A', '2026-02-03'),
+(3,  'Priya',   'priya@example.com',   'Mumbai',    'PRYPM1002B', '2026-02-10'),
+(4,  'Karthik', 'karthik@example.com', 'Chennai',   'KRTPC1003C', '2026-03-05'),
+(5,  'Divya',   'divya@example.com',   'Bangalore', 'DVYPB1004D', '2026-03-18'),
+(6,  'Suresh',  'suresh@example.com',  'Mumbai',    'SRSPM1005E', '2026-04-02'),
+(7,  'Meena',   'meena@example.com',   'Chennai',   'MNAPC1006F', '2026-04-20'),
+(8,  'Rahul',   'rahul@example.com',   'Bangalore', 'RHLPB1007G', '2026-05-11'),
+(9,  'Anjali',  'anjali@example.com',  'Mumbai',    'ANJPM1008H', '2026-06-07'),
+(10, 'Vijay',   'vijay@example.com',   'Chennai',   'VJYPC1009J', '2026-07-14'),
+(11, 'Neha',    'neha@example.com',    'Bangalore', 'NHAPB1010K', '2026-08-22');
+
+-- ---------- accounts ----------
+INSERT INTO account (account_id, account_number, account_type, balance, opened_on, customer_id) VALUES
+(2,  'ACC987654322', 'SAVINGS',  85000,  '2026-02-03', 2),
+(3,  'ACC987654323', 'CURRENT', 240000,  '2026-02-03', 2),
+(4,  'ACC987654324', 'SAVINGS',  62000,  '2026-02-10', 3),
+(5,  'ACC987654325', 'SAVINGS', 120000,  '2026-03-05', 4),
+(6,  'ACC987654326', 'SAVINGS',  45000,  '2026-03-18', 5),
+(7,  'ACC987654327', 'CURRENT',  90000,  '2026-03-18', 5),
+(8,  'ACC987654328', 'CURRENT', 310000,  '2026-04-02', 6),
+(9,  'ACC987654329', 'SAVINGS',  38000,  '2026-04-20', 7),
+(10, 'ACC987654330', 'SAVINGS', 150000,  '2026-05-11', 8),
+(11, 'ACC987654331', 'SAVINGS',  72000,  '2026-06-07', 9),
+(12, 'ACC987654332', 'CURRENT',  55000,  '2026-06-07', 9),
+(13, 'ACC987654333', 'CURRENT', 180000,  '2026-07-14', 10),
+(14, 'ACC987654334', 'SAVINGS',  28000,  '2026-08-22', 11);
+
+-- ---------- loans ----------
+INSERT INTO loan (loan_id, loan_type, principal_amount, interest_rate, tenure_months, sanctioned_on, customer_id) VALUES
+(2, 'HOME',     1500000, 8.4,  240, '2026-02-20', 2),
+(3, 'CAR',       450000, 9.1,   60, '2026-03-01', 3),
+(4, 'PERSONAL',  200000, 12.5,  36, '2026-03-25', 4),
+(5, 'HOME',     2500000, 8.6,  300, '2026-04-15', 6),
+(6, 'CAR',       600000, 9.0,   60, '2026-05-02', 6),
+(7, 'PERSONAL',  300000, 11.9,  48, '2026-06-01', 8),
+(8, 'CAR',       500000, 9.3,   72, '2026-06-28', 9),
+(9, 'HOME',     1200000, 8.5,  180, '2026-08-05', 10);
